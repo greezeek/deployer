@@ -7,6 +7,7 @@
 
 namespace Deployer\Server;
 
+use Herrera\Phar\Update\Exception\Exception;
 use Ssh;
 
 class Configuration
@@ -97,6 +98,10 @@ class Configuration
      */
     private $pemFile;
 
+
+    private $collection = [];
+
+
     /**
      * @param string $host
      * @param int $port
@@ -108,6 +113,7 @@ class Configuration
         $this->setPort($port);
     }
 
+
     /**
      * @param string $path
      * @return $this
@@ -117,6 +123,38 @@ class Configuration
         $this->path = $path;
         return $this;
     }
+
+
+    public function __call($name, $var)
+    {
+        if ((count($var) > 0)) {
+
+            if (count($var) == 1) {
+                $this->collection[$name] = $var[0];
+            } else {
+                $this->collection[$name] = $var;
+            }
+            return $this;
+
+        } else {
+            if (isset($this->collection[$name])) {
+                return $this->collection[$name];
+            }
+            return null;
+        }
+
+    }
+
+
+    public function __get($name)
+    {
+
+        if (isset($this->collection[$name])) {
+            return $this->collection[$name];
+        }
+        return null;
+    }
+
 
     /**
      * Define user name for authentication.
@@ -132,6 +170,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * If you use an ssh config file you can user it.
      * @param string $file Config file path
@@ -143,6 +182,7 @@ class Configuration
         $this->setConfigFile($file);
         return $this;
     }
+
 
     /**
      * @param string $publicKeyFile
@@ -159,12 +199,14 @@ class Configuration
         return $this;
     }
 
+
     public function pemFile($pemFile)
     {
         $this->setAuthenticationMethod(self::AUTH_BY_PEM_FILE);
         $this->setPemFile($pemFile);
         return $this;
     }
+
 
     /**
      * @return int
@@ -174,6 +216,7 @@ class Configuration
         return $this->authenticationMethod;
     }
 
+
     /**
      * @return string
      */
@@ -181,6 +224,7 @@ class Configuration
     {
         return $this->configFile;
     }
+
 
     /**
      * @return string
@@ -190,17 +234,19 @@ class Configuration
         return $this->host;
     }
 
+
     /**
      * @return string
      */
     public function getPassword()
     {
-        if(null === $this->password) {
+        if (null === $this->password) {
             $this->password = askHiddenResponse('Password:');
         }
 
         return $this->password;
     }
+
 
     /**
      * @return string
@@ -210,6 +256,7 @@ class Configuration
         return $this->path;
     }
 
+
     /**
      * @return int
      */
@@ -217,6 +264,7 @@ class Configuration
     {
         return $this->port;
     }
+
 
     /**
      * @return array
@@ -226,16 +274,18 @@ class Configuration
         return $this->publicKey;
     }
 
+
     /**
      * @return string
      */
     public function getPassPhrase()
     {
-        if(null === $this->passPhrase) {
+        if (null === $this->passPhrase) {
             $this->passPhrase = askHiddenResponse('PassPhrase:');
         }
         return $this->passPhrase;
     }
+
 
     /**
      * @return string
@@ -245,16 +295,18 @@ class Configuration
         return $this->privateKey;
     }
 
+
     /**
      * @return string
      */
     public function getUser()
     {
-        if(null === $this->user) {
+        if (null === $this->user) {
             $this->user = ask("User:", trim(runLocally('whoami')));
         }
         return $this->user;
     }
+
 
     /**
      * @param int $authenticationMethod
@@ -264,6 +316,7 @@ class Configuration
         $this->authenticationMethod = $authenticationMethod;
     }
 
+
     /**
      * @param string $configFile
      */
@@ -271,6 +324,7 @@ class Configuration
     {
         $this->configFile = $configFile;
     }
+
 
     /**
      * @param string $host
@@ -282,6 +336,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @param string $passPhrase
      * @return $this
@@ -291,6 +346,7 @@ class Configuration
         $this->passPhrase = $passPhrase;
         return $this;
     }
+
 
     /**
      * @param string $password
@@ -302,6 +358,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @param int $port
      * @return $this
@@ -311,6 +368,7 @@ class Configuration
         $this->port = $port;
         return $this;
     }
+
 
     /**
      * @param string $path
@@ -326,6 +384,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @param string $path
      * @return $this
@@ -340,6 +399,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @param string $user
      * @return $this
@@ -349,6 +409,7 @@ class Configuration
         $this->user = $user;
         return $this;
     }
+
 
     /**
      * @param string $name
@@ -360,6 +421,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @return string
      */
@@ -367,6 +429,7 @@ class Configuration
     {
         return $this->name;
     }
+
 
     /**
      * @param string $wwwUser
@@ -378,6 +441,7 @@ class Configuration
         return $this;
     }
 
+
     /**
      * @return string
      */
@@ -385,6 +449,7 @@ class Configuration
     {
         return $this->wwwUser;
     }
+
 
     /**
      * To auth with pem file use pemFile() method instead of this.
@@ -399,6 +464,7 @@ class Configuration
         $this->pemFile = $pemFile;
         return $this;
     }
+
 
     /**
      * @return string
